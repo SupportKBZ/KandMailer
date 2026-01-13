@@ -40,14 +40,6 @@ class Makers
             );
         }
 
-        $decoded = json_decode($response->getBody(), true);
-
-        if ($decoded === null || json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException(
-                'API error, invalid JSON response: ' . $response->getBody()
-            );
-        }
-
         return $response->getBody();
     }
 
