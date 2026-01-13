@@ -62,9 +62,11 @@ class MailerClient
     /**
      * Send a message.
      *
-     * @return array<string,mixed>|true
+     * @throws \RuntimeException When the API responds with an error.
+     *
+     * @return string
      */
-    public function send(): array|true
+    public function send(): string
     {
         // Check if we have multiple recipients
         $hasMultiple = (is_array($this->email) && count($this->email) > 1) 
@@ -80,10 +82,12 @@ class MailerClient
     /**
      * Add a contact.
      *
-     * @return array<string,mixed>|true
      * @throws \InvalidArgumentException If recipient is multiple or not properly set
+     * @throws \RuntimeException When the API responds with an error.
+     *
+     * @return string
      */
-    public function add(): array|true
+    public function add(): string
     {
         $this->validateSingleRecipient('add');
 
@@ -93,10 +97,12 @@ class MailerClient
     /**
      * Remove a contact.
      *
-     * @return array<string,mixed>|true
      * @throws \InvalidArgumentException If recipient is multiple or not properly set
+     * @throws \RuntimeException When the API responds with an error.
+     *
+     * @return string
      */
-    public function remove(): array|true
+    public function remove(): string
     {
         $this->validateSingleRecipient('remove');
 

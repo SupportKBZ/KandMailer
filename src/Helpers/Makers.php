@@ -13,14 +13,16 @@ class Makers
     /**
      * Send a message.
      *
-     * @param array<string,mixed>|null $payload
-     * @return array<string,mixed>|true
+     * @throws RuntimeException When the API responds with an error or invalid JSON.
+     *
+     * @return string The successful API response body.
      */
     public static function request(
         MailerClient $client,
         string $method,
         string $path
-    ): array|true {
+    ): string
+    {
         $url = $client->getEndpoint() . $path;
 
         $headers = [
@@ -40,7 +42,13 @@ class Makers
 
         $decoded = json_decode($response->getBody(), true);
 
-        return $decoded === null ? true : $decoded;
+        if ($decoded === null || json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException(
+                'API error, invalid JSON response: ' . $response->getBody()
+            );
+        }
+
+        return $response->getBody();
     }
 
     /**

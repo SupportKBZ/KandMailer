@@ -41,7 +41,8 @@ describe('Remove Contact', function () {
         $mockHttp->setResponse(['status' => 'success'], 200);
 
         $result = $this->mailer->remove();
-        expect($result)->toBeArray();
+        expect($result)->toBeString();
+        $result = json_decode($result, true);
         expect($result['status'])->toBe('success');
 
         $url = $mockHttp->getLastUrl();
@@ -61,7 +62,8 @@ describe('Remove Contact', function () {
         $mockHttp->setResponse(['status' => 'success'], 200);
 
         $result = $this->mailer->remove();
-        expect($result)->toBeArray();
+        expect($result)->toBeString();
+        $result = json_decode($result, true);
         expect($result['status'])->toBe('success');
 
         $url = $mockHttp->getLastUrl();

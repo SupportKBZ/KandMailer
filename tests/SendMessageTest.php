@@ -62,7 +62,8 @@ describe('Send Message', function () {
 
         $result = $this->mailer->send();
 
-        expect($result)->toBeArray();
+        expect($result)->toBeString();
+        $result = json_decode($result, true);
         expect($result['status'])->toBe('success');
 
         $url = $mockHttp->getLastUrl();
@@ -89,7 +90,7 @@ describe('Send Message', function () {
 
         $result = $this->mailer->send();
 
-        expect($result)->toBeArray();
+        expect($result)->toBeString();
         
         $url = $mockHttp->getLastUrl();
         $payload = $mockHttp->getLastPayload();
