@@ -22,20 +22,22 @@ $client = new MailerClient('your_api_key', 'https://exemple.com');
 #### Send
 ```php
 // Set single
-$client->toEmail('john@example.com');
-$client->toPhone('+33612345678');
+$client->email('john@example.com');
+$client->phone('+33612345678');
 $client->option('lang', 'en');
 
 // Set multiple
-$client->toEmail(['john@example.com', 'jane@example.com']);
-$client->toPhone(['+33612345678', '+33612345679']);
+$client->email(['john@example.com', 'jane@example.com']);
+$client->email(['+33612345678', '+33612345679']);
+$client->firstName(['John', 'Jane']);
+$client->lastName(['Doe', 'White']);
 $client->options(['lang' => 'en', 'priority' => 'high']);
 
 // Call
 $client->send();
 
 // Chaining
-$client->toEmail('john@example.com')->options(['lang' => 'en', 'priority' => 'high'])->send();
+$client->email('john@example.com')->options(['lang' => 'en', 'priority' => 'high'])->send();
 ```
 
 #### Add
@@ -44,8 +46,8 @@ $client->toEmail('john@example.com')->options(['lang' => 'en', 'priority' => 'hi
 $client->scenario('welcome_scenario');
 $client->firstName('John');
 $client->lastName('Doe');
-$client->toEmail('john@example.com');
-$client->toPhone('+33612345678');
+$client->email('john@example.com');
+$client->phone('+33612345678');
 $client->accountId('12345');
 
 // Options, remove, exists
@@ -60,8 +62,8 @@ $client->add();
 $client->scenario('welcome')
        ->firstName('John')
        ->lastName('Doe')
-       ->toEmail('john@example.com')
-       ->toPhone('+33612345678')
+       ->email('john@example.com')
+       ->phone('+33612345678')
        ->add();
 ```
 
@@ -69,16 +71,16 @@ $client->scenario('welcome')
 ```php
 // Set scenario (required) and email
 $client->scenario('welcome_scenario');
-$client->toEmail('john@example.com');
+$client->email('john@example.com');
 $client->remove();
 
 // Set scenario (required) and phone
 $client->scenario('welcome_scenario');
-$client->toPhone('+33612345678');
+$client->phone('+33612345678');
 $client->remove();
 
 // Chaining
-$client->scenario('welcome_scenario')->toEmail('john@example.com')->remove();
+$client->scenario('welcome_scenario')->email('john@example.com')->remove();
 ```
 
 ### Exigences
