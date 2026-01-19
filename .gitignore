@@ -8,3 +8,7 @@
 /docker-compose.yml
 /Dockerfile
 /.dockerignore
+/Agents.md
+/AGENTS.md
+/.cursor/
+/docs/
