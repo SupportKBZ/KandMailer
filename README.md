@@ -63,28 +63,7 @@ $client->template('welcome_email')
        ->sendToMultiple($recipients);
 ```
 
-**Avantages :**
-- ✅ Code clair et moins sujet aux erreurs
-- ✅ Chaque destinataire a ses propres options indépendantes
-- ✅ Validation automatique au niveau de chaque destinataire
-- ✅ Excellente compatibilité avec les IDE (autocomplétion)
-
-#### Add - Approche Orientée Objet (Recommandée) ✨
-
-```php
-use KandMailer\Models\Recipient;
-
-// Ajout d'un contact
-$client->addTo(new Recipient(
-    email: 'john@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    scenario: 'welcome_sequence',
-    options: ['lang' => 'en', 'source' => 'website']
-));
-```
-
-#### Add - Approche Classique (Toujours supportée)
+#### Add - Approche Classique
 
 ```php
 // Set value
@@ -112,17 +91,7 @@ $client->scenario('welcome')
        ->add();
 ```
 
-#### Remove - Approche Orientée Objet (Recommandée) ✨
-
-```php
-// Suppression d'un contact
-$client->removeFrom(new Recipient(
-    email: 'john@example.com',
-    scenario: 'welcome_sequence'
-));
-```
-
-#### Remove - Approche Classique (Toujours supportée)
+#### Remove - Approche Classique
 
 ```php
 // Set scenario (required) and email
@@ -139,54 +108,14 @@ $client->remove();
 $client->scenario('welcome_scenario')->email('john@example.com')->remove();
 ```
 
-#### Objet Recipient - Propriétés disponibles
+#### Remove - Approche Orientée Objet
 
 ```php
-use KandMailer\Models\Recipient;
-
-$recipient = new Recipient(
-    email: 'john@example.com',           // Email du destinataire (optionnel si phone fourni)
-    phone: '+33612345678',                // Téléphone du destinataire (optionnel si email fourni)
-    firstName: 'John',                    // Prénom (optionnel)
-    lastName: 'Doe',                      // Nom (optionnel)
-    options: [                            // Options personnalisées (optionnel)
-        'lang' => 'en',
-        'crm' => '123456',
-        'customField' => 'value'
-    ],
-    scenario: 'welcome',                  // Scénario spécifique (optionnel)
-    accountId: 'acc-123',                 // ID compte (optionnel)
-    createdAt: new \DateTime('2024-01-15') // Date de création (optionnel)
-);
-
-// Créer à partir d'un array
-$recipient = Recipient::fromArray([
-    'email' => 'john@example.com',
-    'firstName' => 'John',
-    'options' => ['lang' => 'en']
-]);
-
-// Convertir en array
-$array = $recipient->toArray();
-```
-
-**Priorité des valeurs :**
-- Les valeurs définies dans le `Recipient` ont la priorité sur celles du client
-- Les options sont fusionnées (options du `Recipient` > options du client)
-- Si le `Recipient` n'a pas de valeur, celle du client est utilisée
-
-```php
-// Exemple de fusion des options
-$client->template('welcome')
-       ->option('globalKey', 'globalValue')  // Option globale pour tous
-       ->option('lang', 'fr');               // Sera surchargé
-
-$client->sendTo(new Recipient(
+// Suppression d'un contact
+$client->removeFrom(new Recipient(
     email: 'john@example.com',
-    options: ['lang' => 'en', 'customKey' => 'customValue']
+    scenario: 'welcome_sequence'
 ));
-
-// Résultat : options = ['globalKey' => 'globalValue', 'lang' => 'en', 'customKey' => 'customValue']
 ```
 
 #### Méthodes avancées
@@ -206,29 +135,6 @@ $client->template('newsletter')
        ->email('jane@example.com')
        ->options(['lang' => 'fr'])
        ->sendSingle();
-```
-
-##### CreatedAt - Définir une date personnalisée
-```php
-// Définir une date de création pour le contact
-$client->scenario('welcome')
-       ->email('john@example.com')
-       ->createdAt(new \DateTime('2024-01-15'))
-       ->add();
-
-// Avec DateTimeImmutable
-$client->scenario('welcome')
-       ->email('jane@example.com')
-       ->createdAt(new \DateTimeImmutable('2024-01-15 10:30:00'))
-       ->add();
-```
-
-### Tests
-Ce package inclut une suite de tests complète utilisant Pest.
-
-```bash
-# Lancer tous les tests
-composer test
 ```
 
 ### Exigences
