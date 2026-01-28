@@ -112,7 +112,9 @@ class Makers
             $recipient->email,
             $recipient->phone,
             $recipient->firstName ?? $this->client->getFirstName(),
-            $recipient->lastName ?? $this->client->getLastName()
+            $recipient->lastName ?? $this->client->getLastName(),
+            null,
+            null
         );
     }
 
@@ -164,9 +166,9 @@ class Makers
             $recipient->phone,
             $recipient->firstName,
             $recipient->lastName,
-            null,
-            null,
-            null,
+            $recipient->scenario,
+            $recipient->accountId,
+            $recipient->createdAt,
             $recipientOptions
         );
     }

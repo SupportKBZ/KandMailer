@@ -358,6 +358,64 @@ describe('Add Contact with Recipient', function () {
         expect($payload['options']['priority'])->toBe('high');
         expect($payload['options']['campaign'])->toBe('summer');
     });
+
+    test('it Add a contact with accountId', function () {
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            firstName: 'John',
+            scenario: 'welcome',
+            accountId: 'acc-67890'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->addTo($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['email'])->toBe('john@example.com');
+        expect($payload['firstName'])->toBe('John');
+        expect($payload['scenario'])->toBe('welcome');
+        expect($payload['account_id'])->toBe('acc-67890');
+    });
+
+    test('it Use recipient accountId over client accountId in addTo', function () {
+        $this->mailer->accountId('client-account-id');
+
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            scenario: 'welcome',
+            accountId: 'recipient-account-id'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->addTo($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['account_id'])->toBe('recipient-account-id');
+    });
+
+    test('it Use client accountId if recipient has none in addTo', function () {
+        $this->mailer->accountId('client-account-id')->scenario('welcome');
+
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            firstName: 'John'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->addTo($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['account_id'])->toBe('client-account-id');
+    });
 });
 
 describe('Remove Contact with Recipient', function () {
@@ -393,5 +451,60 @@ describe('Remove Contact with Recipient', function () {
         $payload = $mockHttp->getLastPayload();
 
         expect($payload['scenario'])->toBe('default_scenario');
+    });
+
+    test('it Remove a contact with accountId', function () {
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            scenario: 'welcome',
+            accountId: 'acc-12345'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->removeFrom($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['email'])->toBe('john@example.com');
+        expect($payload['scenario'])->toBe('welcome');
+        expect($payload['account_id'])->toBe('acc-12345');
+    });
+
+    test('it Use recipient accountId over client accountId', function () {
+        $this->mailer->accountId('client-account-id');
+
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            scenario: 'welcome',
+            accountId: 'recipient-account-id'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->removeFrom($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['account_id'])->toBe('recipient-account-id');
+    });
+
+    test('it Use client accountId if recipient has none', function () {
+        $this->mailer->accountId('client-account-id')->scenario('welcome');
+
+        $recipient = new Recipient(
+            email: 'john@example.com'
+        );
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->removeFrom($recipient);
+
+        $payload = $mockHttp->getLastPayload();
+
+        expect($payload['account_id'])->toBe('client-account-id');
     });
 });

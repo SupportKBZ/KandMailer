@@ -17,6 +17,10 @@ class RecipientData
         public readonly string|array|null $phone = null,
         public readonly string|array|null $firstName = null,
         public readonly string|array|null $lastName = null,
+        public readonly string|array|null $scenario = null,
+        public readonly string|array|null $accountId = null,
+        public readonly \DateTimeInterface|null $createdAt = null,
+        public readonly array|null $options = null,
     ) {}
     
     /**
@@ -32,6 +36,8 @@ class RecipientData
                 'phone' => $data->getPhone(),
                 'firstName' => $data->getFirstName(),
                 'lastName' => $data->getLastName(),
+                'scenario' => $data->getScenario(),
+                'accountId' => $data->getAccountId(),
             ];
         }
         
@@ -40,6 +46,8 @@ class RecipientData
             phone: $data['phone'] ?? null,
             firstName: $data['firstName'] ?? null,
             lastName: $data['lastName'] ?? null,
+            scenario: $data['scenario'] ?? null,
+            accountId: $data['accountId'] ?? null
         );
     }
 }
