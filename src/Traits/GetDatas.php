@@ -109,6 +109,30 @@ trait GetDatas
     }
 
     /**
+     * Get the content override.
+     */
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    /**
+     * Get the user email that triggered the send.
+     */
+    public function getUserEmail(): ?string
+    {
+        return $this->userEmail;
+    }
+
+    /**
+     * Get the SMTP From address.
+     */
+    public function getFrom(): ?string
+    {
+        return $this->from;
+    }
+
+    /**
      * Get all options.
      *
      * @return array<string,mixed>

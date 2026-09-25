@@ -147,6 +147,33 @@ trait SetDatas
     }
 
     /**
+     * Override the template content (editable templates only).
+     */
+    public function content(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    /**
+     * Set the user email that triggered the send (stored on message for tracing).
+     */
+    public function userEmail(string $userEmail): self
+    {
+        $this->userEmail = $userEmail;
+        return $this;
+    }
+
+    /**
+     * Set the SMTP From address (must be allowlisted server-side).
+     */
+    public function from(string $from): self
+    {
+        $this->from = $from;
+        return $this;
+    }
+
+    /**
      * Add an option.
      */
     public function option(string $key, mixed $value): self
@@ -232,6 +259,9 @@ trait SetDatas
         $this->scenario = null;
         $this->accountId = null;
         $this->createdAt = null;
+        $this->content = null;
+        $this->userEmail = null;
+        $this->from = null;
         $this->options = [];
         $this->multiOptions = [];
         $this->files = [];

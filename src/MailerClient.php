@@ -29,6 +29,9 @@ class MailerClient
     private ?string $scenario = null;
     private ?string $accountId = null;
     private ?\DateTimeInterface $createdAt = null;
+    private ?string $content = null;
+    private ?string $userEmail = null;
+    private ?string $from = null;
 
     /** @var array<string,mixed> */
     private array $options = [];

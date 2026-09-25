@@ -121,18 +121,21 @@ describe('Send with Recipient', function () {
                 email: 'john@example.com',
                 firstName: 'John',
                 lastName: 'Doe',
+                accountId: 'acc-12345',
                 options: ['crm' => '111', 'plan' => 'premium']
             ),
             new Recipient(
                 email: 'jane@example.com',
                 firstName: 'Jane',
                 lastName: 'Smith',
+                accountId: 'acc-12345',
                 options: ['crm' => '222', 'plan' => 'basic']
             ),
             new Recipient(
                 email: 'bob@example.com',
                 phone: '+33628361721',
                 firstName: 'Bob',
+                accountId: 'acc-12345',
                 options: ['crm' => '333']
             ),
         ];
@@ -156,18 +159,21 @@ describe('Send with Recipient', function () {
         expect($payload[0]['email'])->toBe('john@example.com');
         expect($payload[0]['firstName'])->toBe('John');
         expect($payload[0]['lastName'])->toBe('Doe');
+        expect($payload[0]['account_id'])->toBe('acc-12345');
         expect($payload[0]['options']['crm'])->toBe('111');
         expect($payload[0]['options']['plan'])->toBe('premium');
 
         expect($payload[1]['email'])->toBe('jane@example.com');
         expect($payload[1]['firstName'])->toBe('Jane');
         expect($payload[1]['lastName'])->toBe('Smith');
+        expect($payload[1]['account_id'])->toBe('acc-12345');
         expect($payload[1]['options']['crm'])->toBe('222');
         expect($payload[1]['options']['plan'])->toBe('basic');
 
         expect($payload[2]['email'])->toBe('bob@example.com');
         expect($payload[2]['phone'])->toBe('+33628361721');
         expect($payload[2]['firstName'])->toBe('Bob');
+        expect($payload[2]['account_id'])->toBe('acc-12345');
         expect($payload[2]['options']['crm'])->toBe('333');
     });
 
@@ -257,16 +263,19 @@ describe('Send with Recipient', function () {
         $recipients = [
             new Recipient(
                 email: 'john@example.com',
-                options: ['type' => 'email']
+                options: ['type' => 'email'],
+                accountId: 'acc-12345'
             ),
             new Recipient(
                 phone: '+33628361721',
-                options: ['type' => 'sms']
+                options: ['type' => 'sms'],
+                accountId: 'acc-12345'
             ),
             new Recipient(
                 email: 'jane@example.com',
                 phone: '+33628361722',
-                options: ['type' => 'both']
+                options: ['type' => 'both'],
+                accountId: 'acc-12345'
             ),
         ];
 
@@ -283,14 +292,17 @@ describe('Send with Recipient', function () {
 
         expect($payload[0]['email'])->toBe('john@example.com');
         expect($payload[0])->not->toHaveKey('phone');
+        expect($payload[0]['account_id'])->toBe('acc-12345');
         expect($payload[0]['options']['type'])->toBe('email');
 
         expect($payload[1]['phone'])->toBe('+33628361721');
         expect($payload[1])->not->toHaveKey('email');
+        expect($payload[1]['account_id'])->toBe('acc-12345');
         expect($payload[1]['options']['type'])->toBe('sms');
 
         expect($payload[2]['email'])->toBe('jane@example.com');
         expect($payload[2]['phone'])->toBe('+33628361722');
+        expect($payload[2]['account_id'])->toBe('acc-12345');
         expect($payload[2]['options']['type'])->toBe('both');
     });
 

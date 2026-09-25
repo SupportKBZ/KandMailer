@@ -114,7 +114,8 @@ class Makers
             $recipient->firstName ?? $this->client->getFirstName(),
             $recipient->lastName ?? $this->client->getLastName(),
             null,
-            null
+            $recipient->accountId ?? $this->client->getAccountId(),
+            $recipient->createdAt ?? $this->client->getCreatedAt(),
         );
     }
 
@@ -129,6 +130,7 @@ class Makers
         $phones = is_array($this->client->getPhone()) ? $this->client->getPhone() : [$this->client->getPhone()];
         $firstNames = is_array($this->client->getFirstName()) ? $this->client->getFirstName() : [$this->client->getFirstName()];
         $lastNames = is_array($this->client->getLastName()) ? $this->client->getLastName() : [$this->client->getLastName()];
+        $accountIds = is_array($this->client->getAccountId()) ? $this->client->getAccountId() : [$this->client->getAccountId()];
         $multiOptions = $this->client->getMultiOptions();
         
         $maxCount = max(count($emails), count($phones), count($firstNames), count($lastNames));
@@ -140,6 +142,7 @@ class Makers
                 'phone' => $phones[$i] ?? null,
                 'firstName' => $firstNames[$i] ?? null,
                 'lastName' => $lastNames[$i] ?? null,
+                'accountId' => $accountIds[$i] ?? null,
             ]);
             
             $options = !empty($multiOptions) ? ($multiOptions[$i] ?? null) : null;
@@ -232,6 +235,9 @@ class Makers
         $this->addIfSet($payload, 'phone', $phone);
         $this->addIfSet($payload, 'scenario', $scenario ?? $this->client->getScenario());
         $this->addIfSet($payload, 'account_id', $accountId ?? $this->client->getAccountId());
+        $this->addIfSet($payload, 'content', $this->client->getContent());
+        $this->addIfSet($payload, 'user_email', $this->client->getUserEmail());
+        $this->addIfSet($payload, 'from', $this->client->getFrom());
 
         $finalCreatedAt = $createdAt ?? $this->client->getCreatedAt();
         if ($finalCreatedAt !== null) {

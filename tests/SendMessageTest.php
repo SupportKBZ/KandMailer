@@ -95,6 +95,81 @@ describe('Send Message', function () {
         expect($payload['options']['crm'])->toBe('123456');
     });
 
+    it('Send a single email with content override', function () {
+        $content = "Bonjour {{firstName}},\nMessage personnalisé.";
+
+        $this->mailer
+            ->template('relance-impaye')
+            ->email('john@example.com')
+            ->firstName('John')
+            ->content($content);
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendSingle();
+
+        $payload = $mockHttp->getLastPayload();
+        expect($payload['content'])->toBe($content);
+        expect($payload)->not->toHaveKey('options');
+    });
+
+    it('includes content in multiple send payload', function () {
+        $content = 'Contenu partagé';
+
+        $this->mailer
+            ->template('relance-impaye')
+            ->email(['a@example.com', 'b@example.com'])
+            ->content($content);
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendMultiple();
+
+        $payload = $mockHttp->getLastPayload();
+        expect($payload)->toBeArray();
+        foreach ($payload as $item) {
+            expect($item['content'])->toBe($content);
+        }
+    });
+
+    it('reset clears content', function () {
+        $this->mailer
+            ->template('relance-impaye')
+            ->content('Hello')
+            ->reset();
+
+        expect($this->mailer->getContent())->toBeNull();
+    });
+
+    it('Send a single email with user_email and from', function () {
+        $this->mailer
+            ->template('relance-impaye')
+            ->email('client@example.com')
+            ->from('evreux@kandbaz.com')
+            ->userEmail('prout@kandbaz.com');
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendSingle();
+
+        $payload = $mockHttp->getLastPayload();
+        expect($payload['from'])->toBe('evreux@kandbaz.com')
+            ->and($payload['user_email'])->toBe('prout@kandbaz.com');
+    });
+
+    it('reset clears userEmail and from', function () {
+        $this->mailer
+            ->from('evreux@kandbaz.com')
+            ->userEmail('prout@kandbaz.com')
+            ->reset();
+
+        expect($this->mailer->getFrom())->toBeNull()
+            ->and($this->mailer->getUserEmail())->toBeNull();
+    });
+
     it('Send a multiple emails', function () {
         $emails = ['john@example.com', 'jane@example.com'];
         $this->mailer
