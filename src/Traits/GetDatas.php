@@ -171,6 +171,38 @@ trait GetDatas
     }
 
     /**
+     * Get content override.
+     */
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    /**
+     * Get SMTP From address.
+     */
+    public function getFrom(): ?string
+    {
+        return $this->from;
+    }
+
+    /**
+     * Get user email (send trigger trace).
+     */
+    public function getUserEmail(): ?string
+    {
+        return $this->userEmail;
+    }
+
+    /**
+     * Get pacing delay in milliseconds (X-Kandmail-Sleep).
+     */
+    public function getSleep(): ?int
+    {
+        return $this->sleep;
+    }
+
+    /**
      * Get the HTTP client.
      * 
      * @internal This method is reserved for internal testing purposes

@@ -82,6 +82,45 @@ describe('Recipient Model', function () {
             'options' => ['crm' => '123']
         ]);
     });
+
+    it('Create recipient with transactional fields', function () {
+        $recipient = new Recipient(
+            email: 'john@example.com',
+            content: 'Hello {{signature}}',
+            from: 'evreux@kandbaz.com',
+            userEmail: 'prout@kandbaz.com',
+        );
+
+        expect($recipient->content)->toBe('Hello {{signature}}');
+        expect($recipient->from)->toBe('evreux@kandbaz.com');
+        expect($recipient->userEmail)->toBe('prout@kandbaz.com');
+        expect($recipient->toArray())->toMatchArray([
+            'content' => 'Hello {{signature}}',
+            'from' => 'evreux@kandbaz.com',
+            'userEmail' => 'prout@kandbaz.com',
+        ]);
+    });
+
+    it('Create recipient from array with transactional fields', function () {
+        $recipient = Recipient::fromArray([
+            'email' => 'john@example.com',
+            'content' => 'Body',
+            'from' => 'evreux@kandbaz.com',
+            'user_email' => 'prout@kandbaz.com',
+        ]);
+
+        expect($recipient->content)->toBe('Body');
+        expect($recipient->from)->toBe('evreux@kandbaz.com');
+        expect($recipient->userEmail)->toBe('prout@kandbaz.com');
+    });
+
+    it('Validate from and userEmail format', function () {
+        expect(fn() => new Recipient(email: 'john@example.com', from: 'invalid'))
+            ->toThrow(InvalidArgumentException::class, 'Email invalide: invalid');
+
+        expect(fn() => new Recipient(email: 'john@example.com', userEmail: 'bad'))
+            ->toThrow(InvalidArgumentException::class, 'Email invalide: bad');
+    });
 });
 
 describe('Send with Recipient', function () {

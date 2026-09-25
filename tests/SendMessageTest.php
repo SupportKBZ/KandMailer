@@ -1,6 +1,7 @@
 <?php
 
 use KandMailer\MailerClient;
+use KandMailer\Models\Recipient;
 
 beforeEach(function () {
     $this->mailer = createMailer();
@@ -317,5 +318,156 @@ describe('Send Message', function () {
             InvalidArgumentException::class,
             'multiOptions() ne peut être utilisé qu\'avec sendMultiple()'
         );
+    });
+
+
+    it('Send single with content, from and user_email', function () {
+        $this->mailer
+            ->template('pli-huissier')
+            ->email('contact@example.com')
+            ->firstName('Jean')
+            ->content('Bonjour {{firstName}} {{signature}}')
+            ->from('evreux@kandbaz.com')
+            ->userEmail('prout@kandbaz.com');
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendSingle();
+
+        $payload = $mockHttp->getLastPayload();
+        $headers = $mockHttp->getLastHeaders();
+
+        expect($payload['content'])->toBe('Bonjour {{firstName}} {{signature}}');
+        expect($payload['from'])->toBe('evreux@kandbaz.com');
+        expect($payload['user_email'])->toBe('prout@kandbaz.com');
+        expect(array_filter($headers, fn ($h) => str_starts_with($h, 'X-Kandmail-Sleep:')))->toBeEmpty();
+    });
+
+    it('Send multiple with content, from and user_email on each item', function () {
+        $emails = ['a@example.com', 'b@example.com'];
+        $this->mailer
+            ->template('pli-huissier')
+            ->email($emails)
+            ->content('Override {{signature}}')
+            ->from('evreux@kandbaz.com')
+            ->userEmail('prout@kandbaz.com');
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendMultiple();
+
+        $payload = $mockHttp->getLastPayload();
+        expect($payload)->toHaveCount(2);
+        foreach ($payload as $item) {
+            expect($item['content'])->toBe('Override {{signature}}');
+            expect($item['from'])->toBe('evreux@kandbaz.com');
+            expect($item['user_email'])->toBe('prout@kandbaz.com');
+        }
+    });
+
+    it('Send multiple with X-Kandmail-Sleep header', function () {
+        $this->mailer
+            ->template('welcome')
+            ->email(['a@example.com', 'b@example.com'])
+            ->sleep(2000);
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendMultiple();
+
+        expect($mockHttp->getLastUrl())->toContain('/send/list');
+        expect($mockHttp->getLastHeaders())->toContain('X-Kandmail-Sleep: 2000');
+    });
+
+    it('Send to multiple with X-Kandmail-Sleep and recipient overrides', function () {
+        $this->mailer
+            ->template('pli-huissier')
+            ->from('evreux@kandbaz.com')
+            ->userEmail('prout@kandbaz.com')
+            ->sleep(1500);
+
+        $recipients = [
+            new Recipient(
+                email: 'a@example.com',
+                content: 'Body A {{signature}}',
+                from: 'autre@kandbaz.com',
+            ),
+            new Recipient(
+                email: 'b@example.com',
+                content: 'Body B {{signature}}',
+            ),
+        ];
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendToMultiple($recipients);
+
+        $payload = $mockHttp->getLastPayload();
+        $headers = $mockHttp->getLastHeaders();
+
+        expect($mockHttp->getLastUrl())->toContain('/send/list');
+        expect($headers)->toContain('X-Kandmail-Sleep: 1500');
+
+        expect($payload[0]['content'])->toBe('Body A {{signature}}');
+        expect($payload[0]['from'])->toBe('autre@kandbaz.com');
+        expect($payload[0]['user_email'])->toBe('prout@kandbaz.com');
+
+        expect($payload[1]['content'])->toBe('Body B {{signature}}');
+        expect($payload[1]['from'])->toBe('evreux@kandbaz.com');
+        expect($payload[1]['user_email'])->toBe('prout@kandbaz.com');
+    });
+
+    it('Throw error when using sleep with sendSingle', function () {
+        expect(fn() => $this->mailer
+            ->template('welcome')
+            ->email('test@example.com')
+            ->sleep(2000)
+            ->sendSingle()
+        )->toThrow(
+            InvalidArgumentException::class,
+            'sleep() ne peut être utilisé qu\'avec sendMultiple() ou sendToMultiple().'
+        );
+    });
+
+    it('Throw error when using sleep with sendTo', function () {
+        expect(fn() => $this->mailer
+            ->template('welcome')
+            ->sleep(2000)
+            ->sendTo(new Recipient(email: 'test@example.com'))
+        )->toThrow(
+            InvalidArgumentException::class,
+            'sleep() ne peut être utilisé qu\'avec sendMultiple() ou sendToMultiple().'
+        );
+    });
+
+    it('Throw error when sleep is negative', function () {
+        expect(fn() => $this->mailer->sleep(-1))
+            ->toThrow(InvalidArgumentException::class, 'sleep() doit être un entier >= 0.');
+    });
+
+    it('Throw error when from is invalid', function () {
+        expect(fn() => $this->mailer->from('invalid'))
+            ->toThrow(InvalidArgumentException::class, 'Email invalide: invalid');
+    });
+
+    it('Normalize from and userEmail to lowercase', function () {
+        $this->mailer
+            ->template('welcome')
+            ->email('contact@example.com')
+            ->from('Evreux@Kandbaz.com')
+            ->userEmail('Prout@Kandbaz.com');
+
+        $mockHttp = getMockHttp($this->mailer);
+        $mockHttp->setResponse(['status' => 'success'], 200);
+
+        $this->mailer->sendSingle();
+
+        $payload = $mockHttp->getLastPayload();
+        expect($payload['from'])->toBe('evreux@kandbaz.com');
+        expect($payload['user_email'])->toBe('prout@kandbaz.com');
     });
 });

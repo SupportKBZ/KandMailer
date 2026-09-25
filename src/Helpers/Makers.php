@@ -188,7 +188,10 @@ class Makers
             $recipient->scenario,
             $recipient->accountId,
             $recipient->createdAt,
-            array_merge($this->client->getOptions(), $recipient->options)
+            array_merge($this->client->getOptions(), $recipient->options),
+            $recipient->content,
+            $recipient->from,
+            $recipient->userEmail
         );
     }
 
@@ -220,7 +223,10 @@ class Makers
         ?string $scenario = null,
         ?string $accountId = null,
         ?\DateTimeInterface $createdAt = null,
-        ?array $customOptions = null
+        ?array $customOptions = null,
+        ?string $content = null,
+        ?string $from = null,
+        ?string $userEmail = null
     ): array
     {
         $payload = [];
@@ -232,6 +238,9 @@ class Makers
         $this->addIfSet($payload, 'phone', $phone);
         $this->addIfSet($payload, 'scenario', $scenario ?? $this->client->getScenario());
         $this->addIfSet($payload, 'account_id', $accountId ?? $this->client->getAccountId());
+        $this->addIfSet($payload, 'content', $content ?? $this->client->getContent());
+        $this->addIfSet($payload, 'from', $from ?? $this->client->getFrom());
+        $this->addIfSet($payload, 'user_email', $userEmail ?? $this->client->getUserEmail());
 
         $finalCreatedAt = $createdAt ?? $this->client->getCreatedAt();
         if ($finalCreatedAt !== null) {
@@ -286,6 +295,10 @@ class Makers
             'Authorization: Bearer ' . $this->client->getApiKey(),
             'Content-Type: application/json',
         ];
+
+        if ($this->path === '/send/list' && $this->client->getSleep() !== null) {
+            $headers[] = 'X-Kandmail-Sleep: ' . $this->client->getSleep();
+        }
 
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
 

@@ -63,6 +63,32 @@ $client->template('welcome_email')
        ->sendToMultiple($recipients);
 ```
 
+#### Send transactionnel — content, from, user_email, sleep
+
+```php
+// Single : override de contenu + From (Letsignit) + trace déclencheur
+$client->template('pli-huissier-reexpedition')
+       ->email('contact@example.com')
+       ->firstName('Jean')
+       ->content('Corps override {{firstName}} {{signature}}')
+       ->from('evreux@kandbaz.com')
+       ->userEmail('prout@kandbaz.com')
+       ->sendSingle();
+
+// List : pacing via header X-Kandmail-Sleep (ms entre deux envois)
+$client->template('pli-huissier-reexpedition')
+       ->email(['a@example.com', 'b@example.com'])
+       ->from('evreux@kandbaz.com')
+       ->userEmail('prout@kandbaz.com')
+       ->sleep(2000) // 2 s entre chaque job côté API
+       ->sendMultiple();
+```
+
+- `from` : adresse SMTP From + signature Letsignit (allowlist API)
+- `userEmail` : qui a déclenché l’envoi (`messages.user_email`) — ne sert pas à la signature
+- `content` : override du template si `editable = true`
+- `sleep` : uniquement avec `sendMultiple()` / `sendToMultiple()`
+
 #### Add - Approche Classique
 
 ```php

@@ -178,6 +178,53 @@ trait SetDatas
     }
 
     /**
+     * Set content override for editable templates.
+     */
+    public function content(string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    /**
+     * Set the SMTP From address (also used for Letsignit signature).
+     *
+     * @throws \InvalidArgumentException If email is invalid
+     */
+    public function from(string $from): self
+    {
+        $this->validateEmails($from);
+        $this->from = strtolower(trim($from));
+        return $this;
+    }
+
+    /**
+     * Set the email of the user who triggered the send (trace only).
+     *
+     * @throws \InvalidArgumentException If email is invalid
+     */
+    public function userEmail(string $userEmail): self
+    {
+        $this->validateEmails($userEmail);
+        $this->userEmail = strtolower(trim($userEmail));
+        return $this;
+    }
+
+    /**
+     * Set pacing delay in milliseconds between batch sends (sendMultiple / sendToMultiple only).
+     *
+     * @throws \InvalidArgumentException If sleep is negative
+     */
+    public function sleep(int $ms): self
+    {
+        if ($ms < 0) {
+            throw new \InvalidArgumentException('sleep() doit être un entier >= 0.');
+        }
+        $this->sleep = $ms;
+        return $this;
+    }
+
+    /**
      * Add a file.
      */
     public function file(string $label, string $publicId, string $secretId): self
@@ -237,6 +284,10 @@ trait SetDatas
         $this->files = [];
         $this->remove = [];
         $this->exists = [];
+        $this->content = null;
+        $this->from = null;
+        $this->userEmail = null;
+        $this->sleep = null;
 
         return $this;
     }

@@ -45,6 +45,11 @@ class MailerClient
     /** @var array<string> */
     private array $exists = [];
 
+    private ?string $content = null;
+    private ?string $from = null;
+    private ?string $userEmail = null;
+    private ?int $sleep = null;
+
     /**
      * Constructor.
      * 
@@ -74,6 +79,7 @@ class MailerClient
     public function sendSingle(): string
     {
         $this->validateNoMultiOptions();
+        $this->validateNoSleep();
         return (new Makers($this, 'POST', '/send/single'))->executeSingle();
     }
 
@@ -129,6 +135,7 @@ class MailerClient
      */
     public function sendTo(Recipient $recipient): string
     {
+        $this->validateNoSleep();
         return (new Makers($this, 'POST', '/send/single'))->executeWithRecipient($recipient);
     }
 

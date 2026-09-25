@@ -19,6 +19,9 @@ class Recipient
      * @param string|null $scenario Scenario identifier
      * @param string|null $accountId Account identifier
      * @param \DateTimeInterface|null $createdAt Creation date
+     * @param string|null $content Content override for editable templates
+     * @param string|null $from SMTP From address (Letsignit)
+     * @param string|null $userEmail Email of the user who triggered the send
      *
      * @throws InvalidArgumentException If email or phone format is invalid
      */
@@ -31,6 +34,9 @@ class Recipient
         public readonly ?string $scenario = null,
         public readonly ?string $accountId = null,
         public readonly ?\DateTimeInterface $createdAt = null,
+        public readonly ?string $content = null,
+        public readonly ?string $from = null,
+        public readonly ?string $userEmail = null,
     ) {
         $this->validate();
     }
@@ -60,6 +66,18 @@ class Recipient
                 throw new InvalidArgumentException("Numéro de téléphone invalide: {$this->phone}");
             }
         }
+
+        if ($this->from !== null) {
+            if (!filter_var($this->from, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException("Email invalide: {$this->from}");
+            }
+        }
+
+        if ($this->userEmail !== null) {
+            if (!filter_var($this->userEmail, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException("Email invalide: {$this->userEmail}");
+            }
+        }
     }
 
     /**
@@ -78,6 +96,9 @@ class Recipient
             scenario: $data['scenario'] ?? null,
             accountId: $data['accountId'] ?? null,
             createdAt: $data['createdAt'] ?? null,
+            content: $data['content'] ?? null,
+            from: $data['from'] ?? null,
+            userEmail: $data['userEmail'] ?? $data['user_email'] ?? null,
         );
     }
 
@@ -120,6 +141,18 @@ class Recipient
 
         if ($this->createdAt !== null) {
             $data['createdAt'] = $this->createdAt;
+        }
+
+        if ($this->content !== null) {
+            $data['content'] = $this->content;
+        }
+
+        if ($this->from !== null) {
+            $data['from'] = $this->from;
+        }
+
+        if ($this->userEmail !== null) {
+            $data['userEmail'] = $this->userEmail;
         }
 
         return $data;

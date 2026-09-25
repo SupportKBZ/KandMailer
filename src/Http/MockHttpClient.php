@@ -79,6 +79,16 @@ class MockHttpClient implements HttpClientInterface
     }
 
     /**
+     * Get the headers of the last request.
+     *
+     * @return array<int,string>
+     */
+    public function getLastHeaders(): array
+    {
+        return $this->lastRequest['headers'] ?? [];
+    }
+
+    /**
      * Reset the mock to default state.
      */
     public function reset(): void

@@ -66,6 +66,20 @@ trait ValidateDatas
     }
 
     /**
+     * Validate that sleep is not used with single send methods.
+     *
+     * @throws \InvalidArgumentException If sleep is set
+     */
+    private function validateNoSleep(): void
+    {
+        if ($this->sleep !== null) {
+            throw new \InvalidArgumentException(
+                'sleep() ne peut être utilisé qu\'avec sendMultiple() ou sendToMultiple().'
+            );
+        }
+    }
+
+    /**
      * Generic validation for emails or phones.
      * 
      * @param string|array<string> $values
